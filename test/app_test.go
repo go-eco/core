@@ -7,13 +7,17 @@ import (
 )
 
 type appTestService struct {
-	initCall    bool
-	runningCall bool
-	cleanupCall bool
+	initCall      bool
+	configureCall bool
+	runningCall   bool
+	cleanupCall   bool
 }
 
 func (m *appTestService) Init() {
 	m.initCall = true
+}
+func (m *appTestService) Configure() {
+	m.configureCall = true
 }
 func (m *appTestService) Run() {
 	m.runningCall = true
@@ -30,6 +34,9 @@ func TestRunApp(t *testing.T) {
 
 	if !runner.initCall {
 		t.Fatal("Method Init isn't called.")
+	}
+	if !runner.configureCall {
+		t.Fatal("Method Configure isn't called.")
 	}
 	if !runner.runningCall {
 		t.Fatal("Method Run isn't called.")

@@ -13,8 +13,9 @@ type appTestMgo struct {
 	t   *testing.T
 }
 
-func (m *appTestMgo) Init()    {}
-func (m *appTestMgo) Cleanup() {}
+func (m *appTestMgo) Init()      {}
+func (m *appTestMgo) Configure() {}
+func (m *appTestMgo) Cleanup()   {}
 func (m *appTestMgo) Run() {
 	db, close := m.mgo.C("user")
 	defer close()

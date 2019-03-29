@@ -11,22 +11,35 @@ type Emgo interface {
 	Session() *mgo.Session
 	DB() (*mgo.Database, func())
 	C(name string) (*mgo.Collection, func())
+	Cleanup()
+	Configure()
+	Init()
 }
 type emgoImpl struct {
-	s *mgo.Session
+	s         *mgo.Session
+	uriPrefix string
+	uri       string
 }
 
 func GetEmgo(uriPrefix string) Emgo {
-	flagName := uriPrefix + "mgo-url"
-	var url string
-	flag.StringVar(&url, flagName, "localhost", "URL for dialing mongodb server")
-	session, err := mgo.Dial(url)
+	return &emgoImpl{
+		uriPrefix: uriPrefix,
+	}
+}
+
+func (m *emgoImpl) Init() {
+	flagName := m.uriPrefix + "mgo-uri"
+	flag.StringVar(&m.uri, flagName, "localhost", "URI for dialing mongodb server")
+}
+func (m *emgoImpl) Configure() {
+	session, err := mgo.Dial(m.uri)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return &emgoImpl{
-		s: session,
-	}
+	m.s = session
+}
+func (m *emgoImpl) Cleanup() {
+	m.s.Close()
 }
 
 func (m *emgoImpl) Session() *mgo.Session {
