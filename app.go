@@ -4,6 +4,10 @@ import (
 	"flag"
 	"log"
 
+	"github.com/sirupsen/logrus"
+
+	"github.com/go-eco/core/elog"
+
 	"github.com/facebookgo/flagenv"
 	// Load environment variables from .env file
 	_ "github.com/joho/godotenv/autoload"
@@ -15,6 +19,7 @@ type Application interface {
 	RegisterRunner(Runnable)
 	Run()
 	Shutdown()
+	GetLogger() *logrus.Logger
 }
 
 // Runnable interface represent a service that can be executed by method Run()
@@ -42,13 +47,18 @@ type Service interface {
 type applicationImpl struct {
 	services []Service
 	runner   Runnable
+	logger   elog.Elog
 }
 
 // NewApp initiate and return an empty Application interface
 func NewApp() Application {
-	return &applicationImpl{
+	app := &applicationImpl{
 		services: []Service{},
+		logger:   elog.NewLogger(),
 	}
+	app.RegisterService(app.logger)
+
+	return app
 }
 
 // RegisterService bind a service to the application
@@ -85,4 +95,8 @@ func (m *applicationImpl) Shutdown() {
 	for _, s := range m.services {
 		s.Cleanup()
 	}
+}
+
+func (m *applicationImpl) GetLogger() *logrus.Logger {
+	return m.logger.GetLogger()
 }

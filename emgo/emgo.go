@@ -2,7 +2,8 @@ package emgo
 
 import (
 	"flag"
-	"log"
+
+	"github.com/go-eco/core"
 
 	"github.com/globalsign/mgo"
 )
@@ -17,13 +18,15 @@ type Emgo interface {
 }
 type emgoImpl struct {
 	s         *mgo.Session
+	app       core.Application
 	uriPrefix string
 	uri       string
 }
 
-func GetEmgo(uriPrefix string) Emgo {
+func GetEmgo(uriPrefix string, app core.Application) Emgo {
 	return &emgoImpl{
 		uriPrefix: uriPrefix,
+		app:       app,
 	}
 }
 
@@ -32,6 +35,8 @@ func (m *emgoImpl) Init() {
 	flag.StringVar(&m.uri, flagName, "localhost", "URI for dialing mongodb server")
 }
 func (m *emgoImpl) Configure() {
+	log := m.app.GetLogger()
+	log.Errorf("Dial MGO server at %s", m.uri)
 	session, err := mgo.Dial(m.uri)
 	if err != nil {
 		log.Fatal(err)

@@ -27,7 +27,7 @@ func (m *appTestMgo) Run() {
 
 func TestEmgo(t *testing.T) {
 	app := core.NewApp()
-	mgo := emgo.GetEmgo("")
+	mgo := emgo.GetEmgo("", app)
 	app.RegisterService(mgo)
 
 	appTest := appTestMgo{
